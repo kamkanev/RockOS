@@ -7,10 +7,12 @@ main:
 	
 run:
 	qemu-system-i386 -hda RockOS.img
-
+# 2880 - 4 sectors used = 2876
 floppy: main
-	dd if=/dev/zero of=floppy.bin count=2877 bs=512
-	cat boot.bin files.bin shell.bin ./games/snake.img floppy.bin > RockOS.img
+	dd if=/dev/zero of=floppy.bin count=2876 bs=512
+	cat boot.bin files.bin shell.bin 	\
+	 ./games/tetris.img 				\
+	 floppy.bin > RockOS.img
 	rm -f *.bin
 
 clean:
