@@ -5,27 +5,93 @@
 [bits 16]
 [org 0x8000]                    ;tell NASM the code is running shell at address 0x0000_8000
 
+%define BOOTSECTOR_ADDRESS 0x7c0
+%define FILES_ADDRESS 0x7E00
+
+%define ENTER_KEY 0x1c
+%define BACKSPACE_KEY 0x0e
+
 ;init segment register
 mov ax, 0
 mov ds, ax
 mov es, ax
 
-mov si, 0x7E00
+
+
+mov ah, 0x00                        ;BIOS code to set video mode
+mov al, 0x03                        ;80x25 text mode
+int 0x10                            ;set video mode
+
+;print into
+mov si, intro
 call print_string
 
 ;main OS loop
-;shell_loop:
+shell_loop:
 
-;    jmp shell_loop
+    ;print the user prompt
+    mov si, user_prompt
+    call print_string
+
+    ;reset user input
+    mov di, user_input              ;point DESTINATION INDEX register to user_iput variable adress
+    mov al, 0                       ;al is used by stosb
+    times 20 stosb                  ; store zeros at di and then inc di
+    mov di, user_input
+
+    .next_byte:
+        mov ah, 0x00                ;BIOS code to read keyboard
+        int 0x16                    ;read a single keystroke from the keyboard
+
+        cmp ah, ENTER_KEY           ; is ENTER pressed
+        je shell_loop
+        ;je search_game             ;search game by name
+
+        cmp ah, BACKSPACE_KEY       ; is BACKSPACE pressed
+        je .erase_char
+
+        stosb                       ;store key that has been pressed into user_input
+        mov ah, 0x0e                ;BIOS teletype code
+        int 0x10                    ;echo typed character
+        jmp .next_byte              ;read next key from user
+
+    .erase_char:
+        ;erasing in shell
+        mov ah, 0x03                ;BIOS code for getting cursor position
+        int 0x10                    ;get cursor position
+        cmp dl, 3                   ;cursor column to far left
+        je .next_byte               ;if so dont erase any more
+
+        mov ah, 0x0e                ;teletype mode eanabled
+        mov al, 8                   ; ASCII code for '\b'
+        int 0x10                    ;move cursor 1 step back
+
+        mov ah, 0x0e                ;teletype mode eanabled
+        mov al, 0                   ; ASCII code for empty char
+        int 0x10                    ;move cursor 1 step back
+
+        mov ah, 0x0e                ;teletype mode eanabled
+        mov al, 8                   ; ASCII code for '\b'
+        int 0x10                    ;move cursor 1 step back
+
+        ;erasing from user_input variable
+        mov al, 0                   ;AL is used by stosb
+        dec di                      ;go one position back
+        stosb                       ;replace with al and inc di
+        dec di                      ;do one position back (again)
+
+        jmp .next_byte              ;process next byte
+
+    jmp shell_loop
 
 execute:
 
-    mov ax, 0x7c0                   ;init the segment
+    mov ax, BOOTSECTOR_ADDRESS                   ;init the segment
     mov es, ax                      ;init extra segment register
     mov bx, 0                       ;init local offset
     mov cl, 4                       ;select sector (4) from USB/HDD
     call read_sector                ;read sector
-    jmp 0x7c0:0x0000                ;jump to the shell
+    jmp BOOTSECTOR_ADDRESS:0x0000                ;jump to the shell
 
 ;procedure to print a string
 print_string:
@@ -33,7 +99,7 @@ print_string:
     mov ah, 0x0e                    ;enable teletype output for int 0x10 BIOS call
     
     .next_char:
-        lodsb                       ;read next byte from (e)si
+        lodsb                       ;read next byte from (e)si and the inc si
         cmp al, 0                   ;match the '/000' termnating char of a string
         je .return
         int 0x10                    ;assuming ah = 0x0e int 0x10 will print a single char
@@ -57,6 +123,12 @@ read_sector:
         call print_string           ;print error_message
         jmp $                       ;stuck here forever (infinite loop)
 
+;mesages
 error_message db 'Failed to read sector from HDD/USB', 10, 13, 0
+
+;variables
+intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
+user_prompt db 10, 13, ' > ', 0
+user_input times 20 db 0
 
 times 512 - ($ - $$) db 0       ;fill trailing zeros to get exacly 512 bytes long binary file
