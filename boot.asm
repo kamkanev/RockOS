@@ -5,6 +5,10 @@
 [bits 16]                   ;tell NASM to wotk with 16bit code
 [org 0x7c00]                ;tell NASM the code is running bootsector at address 0x0000_7c00
 
+;shortcuts for addresses
+%define FILES_ADDRESS 0x0000_7E00
+%define SHELL_ADDRESS 0x800
+
 ;init segment register
 mov ax, 0
 mov ds, ax
@@ -13,7 +17,7 @@ mov es, ax
 mov si, success_message             ;point source index register to success_message string address
 call print_string
 
-mov bx, 0x0000_7E00                      ;destination address in RAM where data from sector 2 is going to be loaded
+mov bx, FILES_ADDRESS                      ;destination address in RAM where data from sector 2 is going to be loaded
 mov cl, 2                           ;which sector (2) to read from HDD/USB
 call read_sector                    ;read sector from USB
 
@@ -21,12 +25,12 @@ call read_sector                    ;read sector from USB
 ;Physical address = (A * 0x10) + B //real mode
 ;0x0000_8000 = (0x800 * 0x10) + 0
 
-mov ax, 0x800                       ;init the segment
+mov ax, SHELL_ADDRESS                       ;init the segment
 mov es, ax                          ;init extra segment register
 mov bx, 0                           ;init local offset within the segment
 mov cl, 3                           ;sector 3 on USB contains the shell
 call read_sector                    ;read sector from USB/HDD
-jmp 0x800:0x0000                    ;far jump to the shell
+jmp SHELL_ADDRESS:0x0000                    ;far jump to the shell
 
 ;procedure to print a string
 print_string:
