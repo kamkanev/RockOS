@@ -18,6 +18,10 @@ KEY_R   equ 13h
 SCREENW equ 80
 SCREENH equ 24
 SIZE_P  equ 5
+PLAYERBALLSTARTX equ 66
+AIBALLSTARTX equ 90
+BALLSTARTY   equ 7
+WINCON       equ 5
 
 ; ======== VARS =========
 drawColor:  db 0F0h
@@ -26,11 +30,14 @@ aiY:        dw 10                      ;start cpu at y postion 10 rows down
 
 ballX:      dw 66                       ;starting ball X position
 ballY:      dw 8                        ;y starting position for the ball
-ballVX:     db -1
+ballVX:     db -2
 ballVY:     db 1
 
-playerSCORE db 0
-aiSCORE     db 0
+playerSCORE: db 0
+aiSCORE:     db 0
+
+cpuTimmer:   db 0                       ; number of cycles before AI can move
+cpuDiff:     db 1                       ;ai difficulty
 
 ; ======== LOGIC =========
 setup_game:
@@ -78,6 +85,21 @@ game_loop:
     add di, [ballX]
     mov word [es:di], 2020h
 
+    ;draw score
+    ;player score
+    mov di, ROWLEN+66
+    mov bh, 0Eh                         ;black bg, yellow fg
+    mov bl, [playerSCORE]
+    add bl, 30h                         ;ascii number
+    mov [es:di], bx
+
+    ;cpu score
+    mov di, ROWLEN+90
+    mov bh, 0Eh                         ;black bg, yellow fg
+    mov bl, [aiSCORE]
+    add bl, 30h                         ;ascii number
+    mov [es:di], bx
+
 ;player input
     mov ah, 1                           ;BIOS get keyboard status with int 0x16 ah 1
     int 0x16
@@ -123,12 +145,23 @@ game_loop:
 
 ;move ai
     move_ai:
+        ;;ai diff only move the paddle corespondinf to the cpuTimmer cycles
+        mov bl, byte[cpuDiff]
+        cmp byte[cpuTimmer], bl
+        jl inc_cpu_timer
+        mov byte[cpuTimmer], 0
+        jmp move_ball
+
+        inc_cpu_timer:
+            inc byte[cpuTimmer]
+
         mov bx, [aiY]
         cmp bx, word [ballY]
         jle move_ai_down
         dec word[aiY]
         jnz move_ball
         inc word[aiY]
+        jmp move_ball
 
     move_ai_down:
         add bx, SIZE_P
@@ -154,13 +187,13 @@ game_loop:
         cmp word [ballY], 0
         jg check_hit_bot
         neg byte[ballVY]
-        jmp end_collisions_check
+        jmp check_hit_left
 
     check_hit_bot:
         cmp word [ballY], 24
         jl check_hit_player
         neg byte[ballVY]
-        jmp end_collisions_check
+        jmp check_hit_left
 
     check_hit_player:
         cmp word [ballX], PLAYERX
@@ -173,19 +206,49 @@ game_loop:
         jl check_hit_ai
         neg byte[ballVX]
 
-        jmp end_collisions_check
+        jmp check_hit_left
 
     check_hit_ai:
         cmp word[ballX], AIX
-        jne end_collisions_check
+        jne check_hit_left
         mov bx, [aiY]
         cmp bx, word[ballY]
-        jg end_collisions_check
+        jg check_hit_left
         add bx, SIZE_P
         cmp bx, word[ballY]
-        jl end_collisions_check
+        jl check_hit_left
         neg byte[ballVX]
 
+    check_hit_left:
+        cmp word[ballX], 0
+        jg check_hit_right
+        inc byte[aiSCORE]
+
+        cmp byte[aiSCORE], WINCON
+        je game_over
+
+        mov word[ballX], PLAYERBALLSTARTX
+        jmp reset_ball
+
+    check_hit_right:
+        cmp word[ballX], ROWLEN
+        jl end_collisions_check
+        inc byte[playerSCORE]
+
+        cmp byte[playerSCORE], WINCON
+        je game_over
+
+        mov word[ballX], AIBALLSTARTX
+
+    reset_ball:
+        mov word[ballY], BALLSTARTY
+
+        mov bl, [playerSCORE]
+        cmp bl, 0
+        je end_collisions_check
+
+        imul bx, [playerSCORE], 10
+        mov byte[cpuDiff], bl
 
     end_collisions_check:
     ;delay loop
@@ -200,6 +263,21 @@ game_loop:
 jmp game_loop
 
 ;win/lose conditions
+game_over:
+    cmp byte[playerSCORE], WINCON
+    je game_won
+    ;jmp game_lost
+
+game_won:
+    mov dword[es:0000], 0F490F57h   ;WO
+    mov dword[es:0004], 0F210F4Eh   ;N!
+    cli
+    hlt
+
+game_lost:
+    mov dword[es:0000], 0F4F0F4Ch   ;LO
+    mov dword[es:0004], 0F450F53h   ;SE
+    hlt
 
 times 510 - ($ - $$) db 0       ;fill trailing zeros to get exacly 512 bytes long binary file
 dw 0xaa55                       ;set boot signutare
