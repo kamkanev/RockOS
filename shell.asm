@@ -26,6 +26,30 @@ int 0x10                            ;set video mode
 mov si, intro
 call print_string
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;testing str comp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+call compare_strings
+cmp cl, 1
+je print_true
+cmp cl, 0
+je print_false
+
+jmp $
+
+print_true:
+    mov si, match_str
+    call print_string
+    jmp $
+
+print_false:
+    mov si, npmatch_str
+    call print_string
+    jmp $
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;main OS loop
 shell_loop:
 
@@ -84,6 +108,37 @@ shell_loop:
 
     jmp shell_loop
 
+;String comparison
+;DI => scasb compares value stored in DI which is 's' with 's' stored in AX reg and then inc. DI if DF is 0
+;           v
+;addr. 1: s|n|a|o|0|        user input
+;addr. 2: s|n|a|k|e|0|      file name
+;           ^
+;SI => lodsb loads value stored at SI to AX and then inc. SI if DF is 0
+compare_strings:
+    cld                             ;clear direction flag to use later
+    mov di, target_string           ;point DI to target input
+    mov si, source_string           ;point SI to source string
+
+    .next_byte:
+        lodsb                       ;init AX = to where SI points to
+        scasb                       ;compare the value of whre DI is pointing at
+        jne .return_false
+        cmp al, 0                   ;if reach term 0 at the end
+        je .return_true
+
+        jmp .next_byte
+
+    .return_true:
+        mov cl, 1
+        ret
+
+    .return_false:
+        mov cl, 0
+        ret
+
+
+;procedure execute boot sector game/file
 execute:
 
     mov ax, BOOTSECTOR_ADDRESS                   ;init the segment
@@ -130,5 +185,11 @@ error_message db 'Failed to read sector from HDD/USB', 10, 13, 0
 intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
 user_prompt db 10, 13, ' > ', 0
 user_input times 20 db 0
+
+;temp vars
+source_string db 'snake', 0
+target_string db 'snat', 0
+match_str db 'strings match', 0
+npmatch_str db 'strings do not match', 0
 
 times 512 - ($ - $$) db 0       ;fill trailing zeros to get exacly 512 bytes long binary file
