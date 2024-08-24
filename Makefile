@@ -11,8 +11,9 @@ run:
 floppy: main
 	dd if=/dev/zero of=floppy.bin count=2876 bs=512
 	cat boot.bin files.bin shell.bin 	\
-	 ./games/tetris.img 				\
 	 ./games/snake.img					\
+	 ./games/tetris.img 				\
+	 ./pong/pong.bin					\
 	 floppy.bin > RockOS.img
 	rm -f *.bin
 

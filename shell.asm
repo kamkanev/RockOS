@@ -96,7 +96,7 @@ search_file:
     je .return
 
     mov bx, 0                       ;file name index
-    mov dl, 4                       ;sector of first executable on USB or flsh drive
+    mov dl, 3                       ;sector of first executable on USB or flsh drive
 
     .next_game:
         mov ax, [file_list + bx]
