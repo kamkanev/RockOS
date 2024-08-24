@@ -7,6 +7,7 @@
 
 %define BOOTSECTOR_ADDRESS 0x7c0
 %define FILES_ADDRESS 0x7E00
+%define FILES_ADDR_OFFSET 8         
 
 %define ENTER_KEY 0x1c
 %define BACKSPACE_KEY 0x0e
@@ -25,28 +26,6 @@ int 0x10                            ;set video mode
 ;print into
 mov si, intro
 call print_string
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;testing str comp
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-call compare_strings
-cmp cl, 1
-je print_true
-cmp cl, 0
-je print_false
-
-jmp $
-
-print_true:
-    mov si, match_str
-    call print_string
-    jmp $
-
-print_false:
-    mov si, npmatch_str
-    call print_string
-    jmp $
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -68,8 +47,8 @@ shell_loop:
         int 0x16                    ;read a single keystroke from the keyboard
 
         cmp ah, ENTER_KEY           ; is ENTER pressed
-        je shell_loop
-        ;je search_game             ;search game by name
+        ;je shell_loop
+        je .search             ;search game by name
 
         cmp ah, BACKSPACE_KEY       ; is BACKSPACE pressed
         je .erase_char
@@ -106,7 +85,57 @@ shell_loop:
 
         jmp .next_byte              ;process next byte
 
+    .search:
+        call search_file
+
     jmp shell_loop
+
+;search file procedure
+search_file:
+    cmp byte [user_input], 0        ;check first byte user has entered
+    je .return
+
+    mov bx, 0                       ;file name index
+    mov dl, 4                       ;sector of first executable on USB or flsh drive
+
+    .next_game:
+        mov ax, [file_list + bx]
+        cmp ax, no_file
+        je .no_file_found
+        add bx, 2                   ;point bx to the next filename
+        inc dl                      ;point to next sector associated to the file name
+        call compare_strings        ;compare user_input with file name
+        cmp cl, 1                   ;if user input matches file name execute the file
+        je execute                  ;execute binary coresponding to the file name and sector (dl)
+
+        jmp .next_game
+
+    .no_file_found:
+        mov si, new_line
+        call print_string
+
+        mov si, error_no_file
+        call print_string
+    
+    .return: ret
+
+;print all files avaiable on USB
+;WOULD SEPARATE IN SEPARATE APP/FILE LATER ON
+print_files:
+    mov bx, 0                       ;reset file counter
+
+    .next_file:
+        mov ax, [file_list + bx]
+        cmp ax, no_file
+        je .return
+        mov si, ax                  ;si 1st char of curr file name in file_list( files.asm)
+        call print_string           ;print first file from files.asm
+        mov si, new_line
+        call print_string
+        add bx, 2                   ;point bx to next file name
+        jmp .next_file              ;process next file name
+
+    .return: ret
 
 ;String comparison
 ;DI => scasb compares value stored in DI which is 's' with 's' stored in AX reg and then inc. DI if DF is 0
@@ -117,8 +146,8 @@ shell_loop:
 ;SI => lodsb loads value stored at SI to AX and then inc. SI if DF is 0
 compare_strings:
     cld                             ;clear direction flag to use later
-    mov di, target_string           ;point DI to target input
-    mov si, source_string           ;point SI to source string
+    mov di, user_input           ;point DI to target input
+    mov si, ax                   ;point SI to source string
 
     .next_byte:
         lodsb                       ;init AX = to where SI points to
@@ -144,7 +173,7 @@ execute:
     mov ax, BOOTSECTOR_ADDRESS                   ;init the segment
     mov es, ax                      ;init extra segment register
     mov bx, 0                       ;init local offset
-    mov cl, 4                       ;select sector (4) from USB/HDD
+    mov cl, dl                       ;select sector (4) from USB/HDD
     call read_sector                ;read sector
     jmp BOOTSECTOR_ADDRESS:0x0000                ;jump to the shell
 
@@ -180,16 +209,16 @@ read_sector:
 
 ;mesages
 error_message db 'Failed to read sector from HDD/USB', 10, 13, 0
+error_no_file db 'No file found!',0;, 10, 13, 0
 
 ;variables
 intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
 user_prompt db 10, 13, ' > ', 0
 user_input times 20 db 0
+new_line db 10, 13
+no_file dw 0
+file_list dw FILES_ADDRESS, FILES_ADDRESS + FILES_ADDR_OFFSET, FILES_ADDRESS + 2 * FILES_ADDR_OFFSET, no_file
 
 ;temp vars
-source_string db 'snake', 0
-target_string db 'snat', 0
-match_str db 'strings match', 0
-npmatch_str db 'strings do not match', 0
 
 times 512 - ($ - $$) db 0       ;fill trailing zeros to get exacly 512 bytes long binary file

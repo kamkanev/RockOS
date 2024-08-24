@@ -19,6 +19,7 @@
 0x0000_0200     0x0000_03FF       512 bytes         files           (sector 2)
 0x0000_0400     0x0000_05FF       512 bytes         shell           (sector 3)
 0x0000_0600     0x0000_07FF       512 bytes         pong            (sector 4)
+0x0000_0800     0x0000_09FF       512 bytes         tetris          (sector 5)
 .
 .
 .
