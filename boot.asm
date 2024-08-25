@@ -6,13 +6,18 @@
 [org 0x7c00]                ;tell NASM the code is running bootsector at address 0x0000_7c00
 
 ;shortcuts for addresses
+%define BOOTSECTOR_ADDRESS 0x7c00
 %define FILES_ADDRESS 0x0000_7E00
 %define SHELL_ADDRESS 0x800
 
 ;init segment register
 mov ax, 0
-mov ds, ax
-mov es, ax
+mov ds, ax                          ;set data segment
+mov es, ax                          ;set extra segment
+mov ss, ax                          ;set stack segment
+
+mov bp, BOOTSECTOR_ADDRESS          ;set stack base pointer
+mov sp, bp                          ;set stack pointer
 
 mov si, success_message             ;point source index register to success_message string address
 call print_string

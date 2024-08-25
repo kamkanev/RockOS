@@ -14,9 +14,12 @@
 
 ;init segment register
 mov ax, 0
-mov ds, ax
-mov es, ax
+mov ds, ax                          ;set data segment
+mov es, ax                          ;set extra segment
+mov ss, ax                          ;set stack segment
 
+mov bp, 0x7c00                      ;set stack base pointer
+mov sp, bp                          ;set stack pointer
 
 
 mov ah, 0x00                        ;BIOS code to set video mode
