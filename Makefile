@@ -4,6 +4,7 @@ main:
 	nasm -f bin -o boot.bin boot.asm
 	nasm -f bin shell.asm -o shell.bin 
 	nasm -f bin files.asm -o files.bin
+	nasm -f bin ls.asm -o ls.bin
 	
 run:
 	qemu-system-i386 -hda RockOS.img
@@ -11,18 +12,20 @@ run:
 floppy: main
 	dd if=/dev/zero of=floppy.bin count=2876 bs=512
 	cat boot.bin files.bin shell.bin 	\
+	ls.bin								\
 	 ./games/snake.img					\
 	 ./games/tetris.img 				\
-	 ./pong/pong.bin					\
+	 ./pong/pong2.bin					\
 	 floppy.bin > RockOS.img
 	rm -f *.bin
 
 iso: main
 	dd if=/dev/zero of=floppy.bin count=2876 bs=512
-	cat boot.bin files.bin shell.bin 	\
-	 ./games/snake.img					\
-	 ./games/tetris.img 				\
-	 ./pong/pong.bin					\
+	cat boot.bin files.bin shell.bin 			\
+	ls.bin 										\
+	 ./games/snake.img							\
+	 ./games/tetris.img 						\
+	 ./pong/pong2.bin							\
 	 floppy.bin > RockOS.iso
 	rm -f *.bin
 

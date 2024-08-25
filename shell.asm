@@ -121,25 +121,6 @@ search_file:
         call print_string
     
     .return: ret
-
-;print all files avaiable on USB
-;WOULD SEPARATE IN SEPARATE APP/FILE LATER ON
-print_files:
-    mov bx, 0                       ;reset file counter
-
-    .next_file:
-        mov ax, [file_list + bx]
-        cmp ax, no_file
-        je .return
-        mov si, ax                  ;si 1st char of curr file name in file_list( files.asm)
-        call print_string           ;print first file from files.asm
-        mov si, new_line
-        call print_string
-        add bx, 2                   ;point bx to next file name
-        jmp .next_file              ;process next file name
-
-    .return: ret
-
 ;String comparison
 ;DI => scasb compares value stored in DI which is 's' with 's' stored in AX reg and then inc. DI if DF is 0
 ;           v
@@ -220,7 +201,7 @@ user_prompt db 10, 13, ' > ', 0
 user_input times 20 db 0
 new_line db 10, 13
 no_file dw 0
-file_list dw FILES_ADDRESS, FILES_ADDRESS + FILES_ADDR_OFFSET, FILES_ADDRESS + 2 * FILES_ADDR_OFFSET, no_file
+file_list dw FILES_ADDRESS, FILES_ADDRESS + FILES_ADDR_OFFSET, FILES_ADDRESS + 2 * FILES_ADDR_OFFSET, FILES_ADDRESS + 3 * FILES_ADDR_OFFSET, no_file
 
 ;temp vars
 

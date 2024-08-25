@@ -4,16 +4,17 @@
 
 [bits 16]                   ;tell NASM to wotk with 16bit code
 [org 0x7c00]                ;tell NASM the code is running bootsector at address 0x0000_7c00
+%define SHELL_SEGMENT 0x800
 
 jmp setup_game              ;jump over the vars segment
 ; ======== CONSTANTS =========
 VIDMEM equ 0B800h
 ROWLEN equ 160                  ;80 char * 2 bytes
-PLAYERX equ 4                   ;Player X offset  to row 1 start screen
+PLAYERX equ 6                   ;Player X offset  to row 1 start screen
 AIX     equ 154                 ;cpu X offset from end screen by 1 row
 KEY_UP  equ 048h
 KEY_DW  equ 050h
-KEY_C   equ 2Eh
+;KEY_C   equ 2Eh
 KEY_R   equ 13h
 SCREENW equ 80
 SCREENH equ 24
@@ -112,8 +113,8 @@ game_loop:
     je up_pressed
     cmp ah, KEY_DW
     je down_pressed
-    cmp ah, KEY_C
-    je c_pressed
+    ;cmp ah, KEY_C
+    ;je c_pressed
     cmp ah, KEY_R
     je r_pressed
 
@@ -135,13 +136,14 @@ game_loop:
         jmp move_ai
 
     ;change color
-    c_pressed:
-        add byte[drawColor], 10h
-        jmp move_ai
+    ;c_pressed:
+    ;    add byte[drawColor], 10h
+    ;    jmp move_ai
 
     ;reset game
     r_pressed:
-        int 19h                         ;reset vecotor to reload bootlsector
+        ;int 19h                         ;reset vecotor to reload bootlsector
+        jmp SHELL_SEGMENT:0x0000            ;go back to shell
 
 ;move ai
     move_ai:
