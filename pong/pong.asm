@@ -270,16 +270,21 @@ game_over:
     je game_won
     ;jmp game_lost
 
+game_lost:
+    mov dword[es:0000], 0F4F0F4Ch   ;LO
+    mov dword[es:0004], 0F450F53h   ;SE
+
+    mov ah, 0x00                        ;BIOS code to read keyboard
+    int 0x16                            ;read a single keystroke from the keyboard
+    int 19h
+
 game_won:
     mov dword[es:0000], 0F490F57h   ;WO
     mov dword[es:0004], 0F210F4Eh   ;N!
     cli
-    hlt
-
-game_lost:
-    mov dword[es:0000], 0F4F0F4Ch   ;LO
-    mov dword[es:0004], 0F450F53h   ;SE
-    hlt
+    mov ah, 0x00                        ;BIOS code to read keyboard
+    int 0x16                            ;read a single keystroke from the keyboard
+    int 19h
 
 times 510 - ($ - $$) db 0       ;fill trailing zeros to get exacly 512 bytes long binary file
 dw 0xaa55                       ;set boot signutare

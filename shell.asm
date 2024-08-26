@@ -18,7 +18,7 @@ mov ds, ax                          ;set data segment
 mov es, ax                          ;set extra segment
 mov ss, ax                          ;set stack segment
 
-mov bp, 0x7c00                      ;set stack base pointer
+mov bp, BOOTSECTOR_ADDRESS          ;set stack base pointer
 mov sp, bp                          ;set stack pointer
 
 
