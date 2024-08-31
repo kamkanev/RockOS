@@ -13,6 +13,7 @@ floppy: main
 	dd if=/dev/zero of=floppy.bin count=2876 bs=512
 	cat boot.bin files.bin shell.bin 	\
 	ls.bin								\
+	 ./cpuinfo/info.bin					\
 	 ./games/snake.img					\
 	 ./games/tetris.img 				\
 	 ./pong/pong2.bin					\
@@ -23,6 +24,7 @@ iso: main
 	dd if=/dev/zero of=floppy.bin count=2876 bs=512
 	cat boot.bin files.bin shell.bin 			\
 	ls.bin 										\
+	 ./cpuinfo/info.bin							\
 	 ./games/snake.img							\
 	 ./games/tetris.img 						\
 	 ./pong/pong2.bin							\

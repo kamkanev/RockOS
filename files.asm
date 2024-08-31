@@ -5,6 +5,7 @@
 [bits 16]                   ;tell NASM to wotk with 16bit code
 
 db 'list', 0, 0, 0, 0
+db 'info', 0, 0, 0, 0
 db 'snake', 0, 0, 0
 db 'tetros', 0, 0
 db 'pong', 0, 0, 0, 0

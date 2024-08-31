@@ -81,7 +81,7 @@ print_string:
 any_key db 'Press any key to return...', 0
 new_line db 10, 13
 no_file dw 0
-file_list dw FILES_ADDRESS, FILES_ADDRESS + FILES_ADDR_OFFSET, FILES_ADDRESS + 2 * FILES_ADDR_OFFSET, FILES_ADDRESS + 3 * FILES_ADDR_OFFSET, no_file
+file_list dw FILES_ADDRESS, FILES_ADDRESS + FILES_ADDR_OFFSET, FILES_ADDRESS + 2 * FILES_ADDR_OFFSET, FILES_ADDRESS + 3 * FILES_ADDR_OFFSET, FILES_ADDRESS + 4 * FILES_ADDR_OFFSET, no_file
 
 ;temp vars
 
