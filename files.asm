@@ -6,6 +6,8 @@
 
 db 'list', 0, 0, 0, 0
 db 'info', 0, 0, 0, 0
+db 'clear', 0, 0, 0
+db 'theme', 0, 0, 0
 db 'snake', 0, 0, 0
 db 'tetros', 0, 0
 db 'pong', 0, 0, 0, 0

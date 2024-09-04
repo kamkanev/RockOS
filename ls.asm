@@ -81,8 +81,14 @@ print_string:
 any_key db 'Press any key to return...', 0
 new_line db 10, 13
 no_file dw 0
-file_list dw FILES_ADDRESS, FILES_ADDRESS + FILES_ADDR_OFFSET, FILES_ADDRESS + 2 * FILES_ADDR_OFFSET, FILES_ADDRESS + 3 * FILES_ADDR_OFFSET, FILES_ADDRESS + 4 * FILES_ADDR_OFFSET, no_file
-
+file_list dw FILES_ADDRESS                              ;list
+          dw FILES_ADDRESS + FILES_ADDR_OFFSET          ;info
+          dw FILES_ADDRESS + 2 * FILES_ADDR_OFFSET      ;clear
+          dw FILES_ADDRESS + 3 * FILES_ADDR_OFFSET      ;theme
+          dw FILES_ADDRESS + 4 * FILES_ADDR_OFFSET      ;snake
+          dw FILES_ADDRESS + 5 * FILES_ADDR_OFFSET      ;tetros
+          dw FILES_ADDRESS + 6 * FILES_ADDR_OFFSET      ;pong
+          dw no_file
 ;temp vars
 
 times 512 - ($ - $$) db 0       ;fill trailing zeros to get exacly 512 bytes long binary file

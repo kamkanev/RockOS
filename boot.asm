@@ -9,6 +9,7 @@
 %define BOOTSECTOR_ADDRESS 0x7c00
 %define FILES_ADDRESS 0x0000_7E00
 %define SHELL_ADDRESS 0x800
+%define THEME_ADDR 0x0000_8200
 
 ;init segment register
 mov ax, 0
@@ -35,6 +36,17 @@ mov es, ax                          ;init extra segment register
 mov bx, 0                           ;init local offset within the segment
 mov cl, 3                           ;sector 3 on USB contains the shell
 call read_sector                    ;read sector from USB/HDD
+
+
+mov ax, THEME_ADDR                  ; init the segment
+mov es, ax                          ; init EXTRA SEGMENT register
+mov bx, 0                           ; init local offset within the segment
+mov cl, 7                           ; theme sector
+mov al, 1                           ; how many sectors to read
+call read_sector                    ; read sector from USB flash drive
+
+
+mov word [0x6fe], 0x0500            ; init where assembler would input machine codes by default
 jmp SHELL_ADDRESS:0x0000                    ;far jump to the shell
 
 ;procedure to print a string

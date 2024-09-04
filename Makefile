@@ -2,9 +2,13 @@ all: floppy
 
 main:
 	nasm -f bin -o boot.bin boot.asm
-	nasm -f bin shell.asm -o shell.bin 
+
 	nasm -f bin files.asm -o files.bin
 	nasm -f bin ls.asm -o ls.bin
+	nasm -f bin clear.asm -o clear.bin
+	nasm -f bin theme.asm -o theme.bin
+
+	nasm -f bin shell.asm -o shell.bin 
 	
 run:
 	qemu-system-i386 -hda RockOS.img
@@ -14,6 +18,8 @@ floppy: main
 	cat boot.bin files.bin shell.bin 	\
 	ls.bin								\
 	 ./cpuinfo/info.bin					\
+	 clear.bin							\
+	 theme.bin							\
 	 ./games/snake.img					\
 	 ./games/tetris.img 				\
 	 ./pong/pong2.bin					\
@@ -25,6 +31,8 @@ iso: main
 	cat boot.bin files.bin shell.bin 			\
 	ls.bin 										\
 	 ./cpuinfo/info.bin							\
+	 clear.bin									\
+	 theme.bin									\
 	 ./games/snake.img							\
 	 ./games/tetris.img 						\
 	 ./pong/pong2.bin							\

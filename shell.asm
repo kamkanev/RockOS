@@ -9,6 +9,9 @@
 %define FILES_ADDRESS 0x7E00
 %define FILES_ADDR_OFFSET 8         
 
+%define THEME_ADDR 0x8200               ; physical memory address to load THEME at from sector 6
+%define THEME_UPDATE 0x0045             ; local offset of THEME_ADDR used for far call to update theme
+
 %define ENTER_KEY 0x1c
 %define BACKSPACE_KEY 0x0e
 
@@ -26,7 +29,7 @@ mov ah, 0x00                        ;BIOS code to set video mode
 mov al, 0x03                        ;80x25 text mode
 int 0x10                            ;set video mode
 
-;print into
+print into
 mov si, intro
 call print_string
 
@@ -35,6 +38,7 @@ call print_string
 ;main OS loop
 shell_loop:
 
+    call THEME_ADDR:THEME_UPDATE        ; update color scheme
     ;print the user prompt
     mov si, user_prompt
     call print_string
@@ -193,7 +197,7 @@ read_sector:
 
 ;mesages
 error_message db 'Failed to read sector from HDD/USB', 10, 13, 0
-error_no_file db 'No file found!',0;, 10, 13, 0
+error_no_file db 'Command not found!',0;, 10, 13, 0
 
 ;variables
 intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
@@ -201,7 +205,14 @@ user_prompt db 10, 13, ' > ', 0
 user_input times 20 db 0
 new_line db 10, 13
 no_file dw 0
-file_list dw FILES_ADDRESS, FILES_ADDRESS + FILES_ADDR_OFFSET, FILES_ADDRESS + 2 * FILES_ADDR_OFFSET, FILES_ADDRESS + 3 * FILES_ADDR_OFFSET, FILES_ADDRESS + 4 * FILES_ADDR_OFFSET, no_file
+file_list dw FILES_ADDRESS                              ;list
+          dw FILES_ADDRESS + FILES_ADDR_OFFSET          ;info
+          dw FILES_ADDRESS + 2 * FILES_ADDR_OFFSET      ;clear
+          dw FILES_ADDRESS + 3 * FILES_ADDR_OFFSET      ;theme
+          dw FILES_ADDRESS + 4 * FILES_ADDR_OFFSET      ;snake
+          dw FILES_ADDRESS + 5 * FILES_ADDR_OFFSET      ;tetros
+          dw FILES_ADDRESS + 6 * FILES_ADDR_OFFSET      ;pong
+          dw no_file
 
 ;temp vars
 
