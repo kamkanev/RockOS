@@ -88,7 +88,7 @@ print_string:
 
 ; variables
 colors:
-db 'Background & foreground colors:', 10, 13
+db 10, 13, 'Background & foreground colors:', 10, 13
 db '0: black', 10, 13
 db '1: blue', 10, 13
 db '2: green', 10, 13

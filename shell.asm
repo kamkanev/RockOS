@@ -25,13 +25,7 @@ mov bp, BOOTSECTOR_ADDRESS          ;set stack base pointer
 mov sp, bp                          ;set stack pointer
 
 
-mov ah, 0x00                        ;BIOS code to set video mode
-mov al, 0x03                        ;80x25 text mode
-int 0x10                            ;set video mode
 
-print into
-mov si, intro
-call print_string
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -40,6 +34,8 @@ shell_loop:
 
     call THEME_ADDR:THEME_UPDATE        ; update color scheme
     ;print the user prompt
+    mov si, new_line
+    call print_string
     mov si, user_prompt
     call print_string
 
@@ -163,6 +159,8 @@ execute:
     mov bx, 0                       ;init local offset
     mov cl, dl                       ;select sector (4) from USB/HDD
     call read_sector                ;read sector
+    mov si, new_line
+    call print_string
     jmp BOOTSECTOR_ADDRESS:0x0000                ;jump to the shell
 
 ;procedure to print a string
@@ -200,8 +198,8 @@ error_message db 'Failed to read sector from HDD/USB', 10, 13, 0
 error_no_file db 'Command not found!',0;, 10, 13, 0
 
 ;variables
-intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
-user_prompt db 10, 13, ' > ', 0
+;intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
+user_prompt db ' > ', 0
 user_input times 20 db 0
 new_line db 10, 13
 no_file dw 0

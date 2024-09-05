@@ -23,20 +23,23 @@ mov bp, 0x7c00                      ;set stack base pointer
 mov sp, bp                          ;set stack pointer
 
 
-mov ah, 0x00                        ;BIOS code to set video mode
-mov al, 0x03                        ;80x25 text mode
-int 0x10                            ;set video mode
+;mov ah, 0x00                        ;BIOS code to set video mode
+;mov al, 0x03                        ;80x25 text mode
+;int 0x10                            ;set video mode
+
+mov si, new_line
+call print_string
 
 mov si, test_word
 mov cl, 4
 call print_word
 mov si, new_line
 call print_string
-mov si, any_key
-call print_string
+;mov si, any_key
+;call print_string
 
-mov ah, 0x00                        ;BIOS code to read keyboard
-int 0x16                            ;read a single keystroke from the keyboard
+;mov ah, 0x00                        ;BIOS code to read keyboard
+;int 0x16                            ;read a single keystroke from the keyboard
 
 
 jmp SHELL_SEGMENT:0x0000            ;go back to shell
@@ -84,7 +87,7 @@ print_word:
     .return: ret
 
 ;variables
-any_key db 'Press any key to return...', 0
+;any_key db 'Press any key to return...', 0
 test_word db 0x55, 0xaa, 0x00, 0xbb
 new_line db 10, 13
 no_file dw 0

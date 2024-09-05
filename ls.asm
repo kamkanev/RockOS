@@ -23,22 +23,29 @@ mov bp, 0x7c00                      ;set stack base pointer
 mov sp, bp                          ;set stack pointer
 
 
-mov ah, 0x00                        ;BIOS code to set video mode
-mov al, 0x03                        ;80x25 text mode
-int 0x10                            ;set video mode
+;mov ah, 0x00                        ;BIOS code to set video mode
+;mov al, 0x03                        ;80x25 text mode
+;int 0x10                            ;set video mode
+
+mov bx, FILES_ADDRESS               ;destination address in RAM where data from sector 2 is going to be loaded
+mov cl, 2                           ;which sector (2) to read from HDD/USB
+call read_sector                    ;read sector from USB
+
+mov si, new_line
+call print_string
 
 call print_files
 
-mov si, new_line
-call print_string
-mov si, new_line
-call print_string
-mov si, any_key
-call print_string
+;mov si, new_line
+;call print_string
+;mov si, new_line
+;call print_string
+;mov si, any_key
+;call print_string
 
 
-mov ah, 0x00                        ;BIOS code to read keyboard
-int 0x16                            ;read a single keystroke from the keyboard
+;mov ah, 0x00                        ;BIOS code to read keyboard
+;int 0x16                            ;read a single keystroke from the keyboard
 
 
 jmp SHELL_SEGMENT:0x0000            ;go back to shell
@@ -75,10 +82,25 @@ print_string:
         jmp .next_char
         
     .return: ret
-
+;procedure to read a single sector from USB/HDD
+read_sector:
+    mov ah, 0x02                    ;BIOS code for read from storage device
+    mov al, 1                       ;how many sectors to read
+    mov ch, 0                       ;specify celinder
+    mov dh, 0                       ;specify head
+    mov dl, 0x80                    ;specify HDD code
+    int 0x13                        ;read the sector from USB/HDD
+    jc .error
+    ret
+    
+    .error:
+        mov si, error_message
+        call print_string           ;print error_message
+        jmp $                       ;stuck here forever (infinite loop)
 
 ;variables
-any_key db 'Press any key to return...', 0
+;any_key db 'Press any key to return...', 0
+error_message db 'Failed to read sector from HDD/USB', 10, 13, 0
 new_line db 10, 13
 no_file dw 0
 file_list dw FILES_ADDRESS                              ;list

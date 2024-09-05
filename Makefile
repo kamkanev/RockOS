@@ -7,6 +7,7 @@ main:
 	nasm -f bin ls.asm -o ls.bin
 	nasm -f bin clear.asm -o clear.bin
 	nasm -f bin theme.asm -o theme.bin
+	nasm -f bin ./cpuinfo/cpuinfo.asm -o ./cpuinfo/info.bin
 
 	nasm -f bin shell.asm -o shell.bin 
 	
