@@ -31,8 +31,8 @@ mov bx, FILES_ADDRESS               ;destination address in RAM where data from 
 mov cl, 2                           ;which sector (2) to read from HDD/USB
 call read_sector                    ;read sector from USB
 
-mov si, new_line
-call print_string
+;mov si, new_line
+;call print_string
 
 call print_files
 
@@ -107,9 +107,11 @@ file_list dw FILES_ADDRESS                              ;list
           dw FILES_ADDRESS + FILES_ADDR_OFFSET          ;info
           dw FILES_ADDRESS + 2 * FILES_ADDR_OFFSET      ;clear
           dw FILES_ADDRESS + 3 * FILES_ADDR_OFFSET      ;theme
-          dw FILES_ADDRESS + 4 * FILES_ADDR_OFFSET      ;snake
-          dw FILES_ADDRESS + 5 * FILES_ADDR_OFFSET      ;tetros
-          dw FILES_ADDRESS + 6 * FILES_ADDR_OFFSET      ;pong
+          dw FILES_ADDRESS + 4 * FILES_ADDR_OFFSET      ;clock
+          dw FILES_ADDRESS + 5 * FILES_ADDR_OFFSET      ;snake
+          dw FILES_ADDRESS + 6 * FILES_ADDR_OFFSET      ;tetros
+          dw FILES_ADDRESS + 7 * FILES_ADDR_OFFSET      ;pong
+          dw FILES_ADDRESS + 8 * FILES_ADDR_OFFSET      ;reboot
           dw no_file
 ;temp vars
 
