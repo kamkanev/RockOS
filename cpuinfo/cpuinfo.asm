@@ -27,14 +27,118 @@ mov sp, bp                          ;set stack pointer
 ;mov al, 0x03                        ;80x25 text mode
 ;int 0x10                            ;set video mode
 
+;mov si, new_line
+;call print_string
+
+;print flags
+mov si, flags_str
+call print_string
+xor ax, ax
+lahf
+call print_decimal
 mov si, new_line
 call print_string
 
-mov ax, [print_val]
+;print control registers
+mov si, control_reg
+call print_string
+mov eax, cr0
+call print_decimal
+mov si, new_line
+call print_string
+
+;print stack segment
+mov si, stack_segment
+call print_string
+;mov word[print_val], bp
+mov ax, ss;[print]
+call print_decimal
+mov si, new_line
+call print_string
+
+;print data segment
+mov si, data_segment
+call print_string
+;mov word[print_val], ds
+mov ax, ds;[print_val]
+call print_decimal
+mov si, new_line
+call print_string
+
+;print code segment
+mov si, code_segment
+call print_string
+mov ax, cs
+call print_decimal
+mov si, new_line
+call print_string
+
+;print extra segment
+mov si, extra_segment
+call print_string
+mov ax, es
+call print_decimal
+mov si, new_line
+call print_string
+
+;mov si, new_line
+;call print_string
+
+;STACK
+;print base pointer
+mov si, base_pointer
+call print_string
+mov ax, bp
+call print_decimal
+mov si, new_line
+call print_string
+;print stack pointer
+mov si, stack_pointer
+call print_string
+mov ax, sp
+call print_decimal
+mov si, new_line
+call print_string
+
+;mov si, new_line
+;call print_string
+
+;CPUID EAX=0h
+mov si, new_line
+call print_string
+mov si, cpuid_maxval_str
+call print_string
+
+mov eax, 0x0
+cpuid
+push edx
+push ecx
+push ebx
 call print_decimal
 
 mov si, new_line
 call print_string
+mov si, max_cpuid_genu_str
+call print_string
+pop eax
+call print_decimal
+
+mov si, new_line
+call print_string
+mov si, max_cpuid_ntel_str
+call print_string
+
+pop eax
+call print_decimal
+
+mov si, new_line
+call print_string
+mov si, max_cpuid_itel_str
+call print_string
+
+pop eax
+call print_decimal
+
 ;mov si, any_key
 ;call print_string
 
@@ -67,7 +171,8 @@ print_decimal:
 
     .setup:
         cmp ax, 0                   ;if ax is zero go to printing
-        je .print_number
+        ;je .print_number
+        je .check_0
 
         mov bx, 10                  ;init bx to 10
 
@@ -79,6 +184,14 @@ print_decimal:
         xor dx, dx                  ;set dx to 0
         jmp .setup
     
+    .check_0:
+        cmp cx, 0
+        jne .print_number
+
+        ;mov dx, 0
+        push dx
+        inc cx
+
     .print_number:
         mov ah, 0x0e                    ;enable teletype output for int 0x10 BIOS call
 
@@ -101,9 +214,23 @@ print_decimal:
 
 ;variables
 ;any_key db 'Press any key to return...', 0
-print_val dw 652
+;print_val dw 0
+flags_str db 'FLAGS: ', 0
+control_reg db 'Control Reg (CR0): ', 0
+stack_segment db 'Stack Seg (SS): ', 0
+code_segment db 'Code Seg (CS): ', 0
+data_segment db 'Data Seg (DS): ', 0
+extra_segment db 'Extra Seg (ES): ', 0
+base_pointer db 'Base Pointer(BP): ', 0
+stack_pointer db 'Stack Pointer(SP): ', 0
+
+cpuid_maxval_str db 'Maximum Input Value for Basic CPUID Information : ', 0
+max_cpuid_genu_str db 'Genu : ', 0
+max_cpuid_ntel_str db 'ntel : ', 0
+max_cpuid_itel_str db 'itel : ', 0
+
+;note_str db 'All values are in decimal', 0
 new_line db 10, 13
-no_file dw 0
 
 ;temp vars
 
