@@ -30,9 +30,9 @@ mov sp, bp                          ;set stack pointer
 mov si, new_line
 call print_string
 
-mov si, test_word
-mov cl, 4
-call print_word
+mov ax, [print_val]
+call print_decimal
+
 mov si, new_line
 call print_string
 ;mov si, any_key
@@ -58,37 +58,50 @@ print_string:
         
     .return: ret
 
-print_word:
+;procedure to print a decimal value from AX
+print_decimal:
+    ;cld
+    ;initialize count
+    mov cx,0
+    mov dx,0
 
-    cmp cl, 0
-    je .return
-    cld
-    mov ah, 0x0e
+    .setup:
+        cmp ax, 0                   ;if ax is zero go to printing
+        je .print_number
 
-    .next_word:
-        lodsb
-        dec cl
-        cmp al, 0
-        je .zero_word
-        ;add something more for hex print
-        int 0x10
+        mov bx, 10                  ;init bx to 10
 
-        cmp cl, 0
-        je .return
-        jmp .next_word
+        div bx                      ;divide ax to bx => DX = AX / BX
 
-    .zero_word:
-        mov al, '0'
-        int 0x10
-        cmp cl, 0
-        je .return
-        jmp .next_word
+        push dx                     ;push result in stack
+
+        inc cx                      ;increase counter
+        xor dx, dx                  ;set dx to 0
+        jmp .setup
+    
+    .print_number:
+        mov ah, 0x0e                    ;enable teletype output for int 0x10 BIOS call
+
+        .print_char:
+            cmp cx, 0                   ;if cx, 0 exit if not continue to print
+            je .return
+
+            pop dx                      ;get last value in stack
+            add dx, 48                  ;add 48 ASCII for '0'
+
+            mov al, dl
+            ;cmp al, 0                   ;match the '/000' termnating char of a string
+            ;je .return
+            int 0x10                    ;assuming ah = 0x0e int 0x10 will print a single char
+
+            dec cx
+            jmp .print_char
     
     .return: ret
 
 ;variables
 ;any_key db 'Press any key to return...', 0
-test_word db 0x55, 0xaa, 0x00, 0xbb
+print_val dw 652
 new_line db 10, 13
 no_file dw 0
 
