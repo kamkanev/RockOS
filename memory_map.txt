@@ -25,7 +25,7 @@
 0x0000_0C00     0x0000_0DFF       512 bytes         theme           (sector 7)
 0x0000_0E00     0x0000_0FFF       512 bytes         clock           (sector 8)
 0x0000_1000     0x0000_11FF       512 bytes         snake           (sector 9)
-0x0000_1200     0x0000_13FF       512 bytes         tetros          (sector 10)
+0x0000_1200     0x0000_13FF       512 bytes         mines           (sector 10)
 0x0000_1400     0x0000_15FF       512 bytes         pong            (sector 11)
 0x0000_1600     0x0000_17FF       512 bytes         reboot          (sector 12)
 .

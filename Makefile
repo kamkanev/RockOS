@@ -26,7 +26,7 @@ floppy: main
 	 theme.bin							\
 	 ./clock/clock.bin					\
 	 ./games/snake.img					\
-	 ./games/tetris.img 				\
+	 ./games/bootmine.img 				\
 	 ./pong/pong2.bin					\
 	 reboot.bin							\
 	 floppy.bin > RockOS.img
