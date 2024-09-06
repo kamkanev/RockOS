@@ -58,6 +58,53 @@ and al, 0x0F             ; Discard ten's place this time
 add al, 48               ; Add ASCII code of digit 0 again
 mov [CLOCK_STRING+7], al ; Set one's place of second
 
+; output date
+mov ah, 0x04
+int 0x1a	; get date: ch - century, cl - year, dh - month, dl -day
+
+mov al, dl               ; Get day
+shr al, 4                ; Discard one's place for now
+add al, 48               ; Add ASCII code of digit 0
+mov [DATE_STRING+0], al ; Set ten's place of day
+mov al, dl               ; Get day again
+and al, 0x0F             ; Discard ten's place this time
+add al, 48               ; Add ASCII code of digit 0 again
+mov [DATE_STRING+1], al ; Set one's place of day
+
+mov al, dh               ; Get month
+shr al, 4                ; Discard one's place for now
+add al, 48               ; Add ASCII code of digit 0
+mov [DATE_STRING+3], al ; Set ten's place of month
+mov al, dh               ; Get month again
+and al, 0x0F             ; Discard ten's place this time
+add al, 48               ; Add ASCII code of digit 0 again
+mov [DATE_STRING+4], al ; Set one's place of month
+
+mov al, ch               ; Get hour
+shr al, 4                ; Discard one's place for now
+add al, 48               ; Add ASCII code of digit 0
+mov [DATE_STRING+6], al ; Set ten's place of hour
+mov al, ch               ; Get hour again
+and al, 0x0F             ; Discard ten's place this time
+add al, 48               ; Add ASCII code of digit 0 again
+mov [DATE_STRING+7], al ; Set one's place of hour
+
+mov al, cl               ; Get minute
+shr al, 4                ; Discard one's place for now
+add al, 48               ; Add ASCII code of digit 0
+mov [DATE_STRING+8], al ; Set ten's place of minute
+mov al, cl               ; Get minute again
+and al, 0x0F             ; Discard ten's place this time
+add al, 48               ; Add ASCII code of digit 0 again
+mov [DATE_STRING+9], al ; Set one's place of minute
+
+
+mov si, DATE_STRING
+call print_string
+
+mov si, big_space
+call print_string
+
 mov si, CLOCK_STRING
 call print_string
 
@@ -132,6 +179,8 @@ print_decimal:
 
 ;variables
 CLOCK_STRING db '00:00:00', 0   ; Place in some separate (non-code) area
+big_space db '            ', 0
+DATE_STRING db '00.00.0000', 0
 new_line db 10, 13
 
 ;temp vars
