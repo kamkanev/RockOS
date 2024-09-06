@@ -107,6 +107,8 @@ call print_string
 
 mov si, CLOCK_STRING
 call print_string
+mov si, UTC
+call print_string
 
 mov si, new_line
 call print_string
@@ -180,6 +182,7 @@ print_decimal:
 ;variables
 CLOCK_STRING db '00:00:00', 0   ; Place in some separate (non-code) area
 big_space db '            ', 0
+UTC db ' UTC', 0
 DATE_STRING db '00.00.0000', 0
 new_line db 10, 13
 

@@ -27,9 +27,11 @@ This is a mini project of creating an operating system from scratch using all my
 | 0x0000_0800 | 0x0000_09FF | 512 bytes | info        | 5      |
 | 0x0000_0A00 | 0x0000_0BFF | 512 bytes | clear       | 6      |
 | 0x0000_0C00 | 0x0000_0DFF | 512 bytes | theme       | 7      |
-| 0x0000_0E00 | 0x0000_0FFF | 512 bytes | snake       | 8      |
-| 0x0000_1000 | 0x0000_11FF | 512 bytes | tetros      | 9      |
-| 0x0000_1200 | 0x0000_13FF | 512 bytes | pong        | 10     |
+| 0x0000_0E00 | 0x0000_0FFF | 512 bytes | clock       | 8      |
+| 0x0000_1000 | 0x0000_11FF | 512 bytes | snake       | 9      |
+| 0x0000_1200 | 0x0000_13FF | 512 bytes | tetros      | 10     |
+| 0x0000_1400 | 0x0000_15FF | 512 bytes | pong        | 11     |
+| 0x0000_1600 | 0x0000_17FF | 512 bytes | reboot      | 12     |
 
 ---
 
@@ -133,7 +135,7 @@ make iso
 make run
 ```
 
-![Screenshot](./screenshots/no_file.png)
+![Screenshot](./screenshots/info.png)
 
 ```batch
 make iso-run
