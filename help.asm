@@ -1,5 +1,5 @@
 ;=========================
-;          LIST
+;          HELP
 ;=========================
 
 [bits 16]
@@ -57,17 +57,46 @@ print_files:
     mov bx, 0                       ;reset file counter
 
     .next_file:
-        mov ax, [file_list + bx]
-        cmp ax, no_file
-        je .return
-        mov si, ax                  ;si 1st char of curr file name in file_list( files.asm)
+        mov ax, FILES_ADDRESS       ;[file_list + bx]
+        add ax, bx
+        ;cmp byte[ax], byte[cl]
+        ;je .return
+        call compare_strings
+        cmp cl, 1                   ;if user input matches file name execute the file
+        je .return                  ;execute binary coresponding to the file name and sector (dl)
+        mov ax, FILES_ADDRESS       ;si 1st char of curr file name in file_list( files.asm)
+        add ax, bx
+        mov si, ax
         call print_string           ;print first file from files.asm
         mov si, new_line
         call print_string
-        add bx, 2                   ;point bx to next file name
+        add bx, FILES_ADDR_OFFSET;2                   ;point bx to next file name
         jmp .next_file              ;process next file name
 
     .return: ret
+
+compare_strings:
+    cld                             ;clear direction flag to use later
+    mov di, end_file                ;point DI to target input
+    mov si, ax                      ;point SI to source string
+
+    .next_byte:
+        lodsb                       ;init AX = to where SI points to
+        scasb                       ;compare the value of whre DI is pointing at
+        jne .return_false
+        cmp al, 0                   ;if reach term 0 at the end
+        je .return_true
+
+        jmp .next_byte
+
+    .return_true:
+        mov cl, 1
+        ret
+
+    .return_false:
+        mov cl, 0
+        ret
+
 
 ;procedure to print a string
 print_string:
@@ -102,17 +131,18 @@ read_sector:
 ;any_key db 'Press any key to return...', 0
 error_message db 'Failed to read sector from HDD/USB', 10, 13, 0
 new_line db 10, 13
-no_file dw 0
-file_list dw FILES_ADDRESS                              ;list
-          dw FILES_ADDRESS + FILES_ADDR_OFFSET          ;info
-          dw FILES_ADDRESS + 2 * FILES_ADDR_OFFSET      ;clear
-          dw FILES_ADDRESS + 3 * FILES_ADDR_OFFSET      ;theme
-          dw FILES_ADDRESS + 4 * FILES_ADDR_OFFSET      ;clock
-          dw FILES_ADDRESS + 5 * FILES_ADDR_OFFSET      ;snake
-          dw FILES_ADDRESS + 6 * FILES_ADDR_OFFSET      ;tetros
-          dw FILES_ADDRESS + 7 * FILES_ADDR_OFFSET      ;pong
-          dw FILES_ADDRESS + 8 * FILES_ADDR_OFFSET      ;reboot
-          dw no_file
+end_file db 0, 0, 0, 0, 0, 0, 0, 0
+;no_file dw 0
+;file_list dw FILES_ADDRESS                              ;list
+;          dw FILES_ADDRESS + FILES_ADDR_OFFSET          ;info
+;          dw FILES_ADDRESS + 2 * FILES_ADDR_OFFSET      ;clear
+;          dw FILES_ADDRESS + 3 * FILES_ADDR_OFFSET      ;theme
+;          dw FILES_ADDRESS + 4 * FILES_ADDR_OFFSET      ;clock
+;          dw FILES_ADDRESS + 5 * FILES_ADDR_OFFSET      ;snake
+;          dw FILES_ADDRESS + 6 * FILES_ADDR_OFFSET      ;mines
+;          dw FILES_ADDRESS + 7 * FILES_ADDR_OFFSET      ;pong
+;          dw FILES_ADDRESS + 8 * FILES_ADDR_OFFSET      ;reboot
+;          dw no_file
 ;temp vars
 
 times 512 - ($ - $$) db 0       ;fill trailing zeros to get exacly 512 bytes long binary file

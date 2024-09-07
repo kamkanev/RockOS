@@ -4,7 +4,7 @@ main:
 	nasm -f bin -o boot.bin boot.asm
 
 	nasm -f bin files.asm -o files.bin
-	nasm -f bin ls.asm -o ls.bin
+	nasm -f bin help.asm -o help.bin
 	nasm -f bin clear.asm -o clear.bin
 	nasm -f bin theme.asm -o theme.bin
 	nasm -f bin reboot.asm -o reboot.bin
@@ -20,7 +20,7 @@ run:
 floppy: main
 	dd if=/dev/zero of=floppy.bin count=2876 bs=512
 	cat boot.bin files.bin shell.bin 	\
-	ls.bin								\
+	help.bin							\
 	 ./cpuinfo/info.bin					\
 	 clear.bin							\
 	 theme.bin							\
@@ -35,13 +35,13 @@ floppy: main
 iso: main
 	dd if=/dev/zero of=floppy.bin count=2876 bs=512
 	cat boot.bin files.bin shell.bin 			\
-	ls.bin 										\
+	help.bin 									\
 	 ./cpuinfo/info.bin							\
 	 clear.bin									\
 	 theme.bin									\
 	 ./clock/clock.bin							\
 	 ./games/snake.img							\
-	 ./games/tetris.img 						\
+	 ./games/bootmine.img 						\
 	 ./pong/pong2.bin							\
 	 reboot.bin									\
 	 floppy.bin > RockOS.iso

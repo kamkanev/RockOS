@@ -87,7 +87,7 @@ read_sector:
         jmp $                       ;stuck here forever (infinite loop)
 
 ;message
-intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
+intro db 'Type "help" to list the avaiable commands ', 10, 13, 0
 ;success_message db 'RockOS is loaded!', 10, 13, 0
 error_message db 'Failed to read sector from HDD/USB', 10, 13, 0
 

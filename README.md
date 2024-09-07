@@ -4,7 +4,6 @@ This is a mini project of creating an operating system from scratch using all my
 
 <img title="" src="./screenshots/1.png" alt="Screenshot OS" width="554">
 
-
 ### Goals:
 
 The main goal of RockOS is to be able to run on ony computer (regadless of architecture) and also virtually (using virtual machine).
@@ -131,7 +130,6 @@ At the momment the only working commands are `list` and all the commands use see
 
 ![pong](./screenshots/pong.png)
 
-
 ## RAM Memory table:
 
 | Start       | End         | Size        | Desc.      |
@@ -149,7 +147,7 @@ At the momment the only working commands are `list` and all the commands use see
 | 0x0000_0000 | 0x0000_01FF | 512 bytes | bootloader  | 1      |
 | 0x0000_0200 | 0x0000_03FF | 512 bytes | files       | 2      |
 | 0x0000_0400 | 0x0000_05FF | 512 bytes | shell       | 3      |
-| 0x0000_0600 | 0x0000_07FF | 512 bytes | ls          | 4      |
+| 0x0000_0600 | 0x0000_07FF | 512 bytes | help        | 4      |
 | 0x0000_0800 | 0x0000_09FF | 512 bytes | info        | 5      |
 | 0x0000_0A00 | 0x0000_0BFF | 512 bytes | clear       | 6      |
 | 0x0000_0C00 | 0x0000_0DFF | 512 bytes | theme       | 7      |
@@ -168,3 +166,11 @@ At the momment the only working commands are `list` and all the commands use see
 - [ ] Can't load files/games larger than **512bytes**.
 
 - [ ] Optimize the **stack** and **heap**
+
+
+
+## Credits
+
+Minesweeper (BootMine) from [io12]([io12 (Benjamin Levy) · GitHub](https://github.com/io12))
+
+Theme code and other programs from [Code Monkey King]([maksimKorzh (Code Monkey King) · GitHub](https://github.com/maksimKorzh))

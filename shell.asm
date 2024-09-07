@@ -102,11 +102,20 @@ search_file:
     mov dl, 3                       ;sector of first executable on USB or flsh drive
 
     .next_game:
-        mov ax, [file_list + bx]
-        cmp ax, no_file
-        je .no_file_found
-        add bx, 2                   ;point bx to the next filename
+        mov ax, FILES_ADDRESS;[file_list + bx]
+        add ax, bx
+        ;cmp ax, no_file
+        ;je .no_file_found
+        mov di, end_file
+        call compare_strings        ;compare user_input with file name
+        cmp cl, 1                   ;if user input matches file name execute the file
+        je .no_file_found                  ;execute binary coresponding to the file name and sector (dl)
+
+        mov ax, FILES_ADDRESS;[file_list + bx]
+        add ax, bx
+        add bx, FILES_ADDR_OFFSET                   ;point bx to the next filename
         inc dl                      ;point to next sector associated to the file name
+        mov di, user_input
         call compare_strings        ;compare user_input with file name
         cmp cl, 1                   ;if user input matches file name execute the file
         je execute                  ;execute binary coresponding to the file name and sector (dl)
@@ -130,7 +139,7 @@ search_file:
 ;SI => lodsb loads value stored at SI to AX and then inc. SI if DF is 0
 compare_strings:
     cld                             ;clear direction flag to use later
-    mov di, user_input           ;point DI to target input
+    ;mov di, user_input           ;point DI to target input
     mov si, ax                   ;point SI to source string
 
     .next_byte:
@@ -202,17 +211,18 @@ error_no_file db 'Command not found!',0;, 10, 13, 0
 user_prompt db ' > ', 0
 user_input times 20 db 0
 new_line db 10, 13
-no_file dw 0
-file_list dw FILES_ADDRESS                              ;list
-          dw FILES_ADDRESS + FILES_ADDR_OFFSET          ;info
-          dw FILES_ADDRESS + 2 * FILES_ADDR_OFFSET      ;clear
-          dw FILES_ADDRESS + 3 * FILES_ADDR_OFFSET      ;theme
-          dw FILES_ADDRESS + 4 * FILES_ADDR_OFFSET      ;clock
-          dw FILES_ADDRESS + 5 * FILES_ADDR_OFFSET      ;snake
-          dw FILES_ADDRESS + 6 * FILES_ADDR_OFFSET      ;tetros
-          dw FILES_ADDRESS + 7 * FILES_ADDR_OFFSET      ;pong
-          dw FILES_ADDRESS + 8 * FILES_ADDR_OFFSET      ;reboot
-          dw no_file
+end_file db 0, 0, 0, 0, 0, 0, 0, 0
+;no_file dw 0
+;file_list dw FILES_ADDRESS                              ;list
+;          dw FILES_ADDRESS + FILES_ADDR_OFFSET          ;info
+;          dw FILES_ADDRESS + 2 * FILES_ADDR_OFFSET      ;clear
+;          dw FILES_ADDRESS + 3 * FILES_ADDR_OFFSET      ;theme
+;          dw FILES_ADDRESS + 4 * FILES_ADDR_OFFSET      ;clock
+;          dw FILES_ADDRESS + 5 * FILES_ADDR_OFFSET      ;snake
+;          dw FILES_ADDRESS + 6 * FILES_ADDR_OFFSET      ;mines
+;          dw FILES_ADDRESS + 7 * FILES_ADDR_OFFSET      ;pong
+;          dw FILES_ADDRESS + 8 * FILES_ADDR_OFFSET      ;reboot
+;          dw no_file
 
 ;temp vars
 
