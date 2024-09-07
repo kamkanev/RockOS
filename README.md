@@ -20,9 +20,15 @@ The main goal of RockOS is to be able to run on ony computer (regadless of archi
 
 - [ ] access to disks (mounting/dismounting)
 
-- [ ] graphical interface (desktop and mouse)
+- [x] graphical interface (themes and mouse(not yet))
 
-- [ ] ect
+- [x] real time clock
+
+- [x] play games
+
+- [x] gives CPU information
+
+- [ ] gives hardware information
 
 ---
 
@@ -120,6 +126,20 @@ make clean
 make iso-clean
 ```
 
+You can also make a bootable USB using:
+
+```batch
+sudo dd if=RockOS.img of=/dev/sda count=2880 bs=512
+```
+
+Find your USB using
+
+```batch
+sudo blkid
+```
+
+
+
 ---
 
 ## Usage:
@@ -161,11 +181,15 @@ At the momment the only working commands are `list` and all the commands use see
 
 ## Problems:
 
-- [ ] Not all games return you the shell
+- [x] Not all games return you the shell
 
-- [ ] Can't load files/games larger than **512bytes**.
+- [ ] Can't load files/games larger than **512bytes**. (In Progress)
 
-- [ ] Optimize the **stack** and **heap**
+- [x] Optimize the **stack** and **heap** (to best of my abilities)
+
+- [ ] On game exit theme may change
+
+- [ ] Last row in shell is not included in the theme
 
 ## Credits
 
