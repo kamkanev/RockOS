@@ -153,7 +153,7 @@ At the momment the only working commands are `list` and all the commands use see
 | 0x0000_0C00 | 0x0000_0DFF | 512 bytes | theme       | 7      |
 | 0x0000_0E00 | 0x0000_0FFF | 512 bytes | clock       | 8      |
 | 0x0000_1000 | 0x0000_11FF | 512 bytes | snake       | 9      |
-| 0x0000_1200 | 0x0000_13FF | 512 bytes | tetros      | 10     |
+| 0x0000_1200 | 0x0000_13FF | 512 bytes | mines       | 10     |
 | 0x0000_1400 | 0x0000_15FF | 512 bytes | pong        | 11     |
 | 0x0000_1600 | 0x0000_17FF | 512 bytes | reboot      | 12     |
 
@@ -166,8 +166,6 @@ At the momment the only working commands are `list` and all the commands use see
 - [ ] Can't load files/games larger than **512bytes**.
 
 - [ ] Optimize the **stack** and **heap**
-
-
 
 ## Credits
 
