@@ -104,7 +104,9 @@ make
 make iso
 ```
 
-   You can either run the files on a virtual machine or in [Virtual x86](https://copy.sh/v86/) or you can run the following command to run the OS in QEMU simulator.
+### Run in simulation:
+
+    You can either run the files on a virtual machine or in [Virtual x86](https://copy.sh/v86/) or you can run the following command to run the OS in QEMU simulator.
 
 ```batch
 make run
@@ -125,6 +127,8 @@ make clean
 ```batch
 make iso-clean
 ```
+
+### Run on bootable USB
 
 You can also make a bootable USB using:
 
