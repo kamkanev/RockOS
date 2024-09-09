@@ -138,13 +138,45 @@ Find your USB using
 sudo blkid
 ```
 
-
-
 ---
 
 ## Usage:
 
-At the momment the only working commands are `list` and all the commands use see there:
+At the momment the only working commands are `help` and all the commands use see there:
+
+#### Contols for the games:
+
+**pong**
+
+- first to 5 points wins
+
+- `q` to exit to the shell
+
+- *On win or lose reboots (bug)*
+
+- *the scores stays in shell after exit. Use <u>clear</u> cmd. (bug)*
+
+**mines**
+
+- move cursor with `arrow keys`
+
+- `space` to view the box
+
+- `enter` to put a flag
+
+- to game over or win restart the game with `r`
+
+- `q` to exit the game at any time
+
+- *text game over and win doesn't show (bug)*
+
+**snake**
+
+- `WASD` to move around
+
+- `q` to exit
+
+- *Use <u>clear</u> to reset the theme (bug)*
 
 <img title="" src="./screenshots/list.png" alt="listsc" width="627" data-align="left"><img title="" src="./screenshots/theme.png" alt="theme" width="640" data-align="inline">
 
