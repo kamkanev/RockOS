@@ -1,6 +1,8 @@
 # RockOS
 
-This is a mini project of creating an operating system from scratch using all my knowage in computer architerture and operating systems. I'm using assembly x86 in 16 bit real mode togehter with mashine code.
+This is a mini project of creating an operating system from scratch using all my knowage in computer architerture and operating systems. I'm using assembly x86 in 16 bit real mode togehter with mashine code. See youtube video [I build my own OS using Assembly x86 | RockOS - YouTube](https://www.youtube.com/watch?v=JnOBwbkbjWM).
+
+***Also don't forget to star the project and fork it if you like.***
 
 <img title="" src="./screenshots/1.png" alt="Screenshot OS" width="554">
 
