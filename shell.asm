@@ -13,6 +13,7 @@
 %define THEME_UPDATE 0x0045             ; local offset of THEME_ADDR used for far call to update theme
 
 %define user_input 0x0510               ; fixed memory address for user input so other apps can read args
+%define PATH_BUFFER 0x0540
 
 %define ENTER_KEY 0x1c
 %define BACKSPACE_KEY 0x0e
@@ -38,8 +39,7 @@ shell_loop:
     ;print the user prompt
     mov si, new_line
     call print_string
-    mov si, user_prompt
-    call print_string
+    call print_prompt
 
     ;reset user input
     mov di, user_input              ;point DESTINATION INDEX register to user_iput variable adress
@@ -67,8 +67,9 @@ shell_loop:
     .erase_char:
         ;erasing in shell
         mov ah, 0x03                ;BIOS code for getting cursor position
+        mov bh, 0
         int 0x10                    ;get cursor position
-        cmp dl, 3                   ;cursor column to far left
+        cmp dl, byte [prompt_min_col]
         je .next_byte               ;if so dont erase any more
 
         mov ah, 0x0e                ;teletype mode eanabled
@@ -194,6 +195,17 @@ print_string:
         
     .return: ret
 
+print_prompt:
+    mov si, PATH_BUFFER
+    call print_string
+    mov si, prompt_suffix
+    call print_string
+    mov ah, 0x03
+    mov bh, 0
+    int 0x10
+    mov byte [prompt_min_col], dl
+    ret
+
 ;procedure to read a single sector from USB/HDD
 read_sector:
     mov ah, 0x02                    ;BIOS code for read from storage device
@@ -216,7 +228,8 @@ error_no_file db 'Command not found!',0;, 10, 13, 0
 
 ;variables
 ;intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
-user_prompt db ' > ', 0
+prompt_suffix db ' > ', 0
+prompt_min_col db 0
 new_line db 10, 13
 end_file db 0, 0, 0, 0, 0, 0, 0, 0
 ;no_file dw 0

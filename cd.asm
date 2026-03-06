@@ -10,6 +10,7 @@
 %define DIR_TABLE_SECTORS   10
 %define CWD_ID              0x0500
 %define USER_INPUT          0x0510
+%define PATH_BUFFER         0x0540
 %define DIR_BUFFER          0x2000
 
 start:
@@ -82,6 +83,7 @@ start:
     jne .next_parent_entry
     mov ax, word [si + 12]
     mov word [CWD_ID], ax
+    call path_pop
     jmp .exit
 
 .next_parent_entry:
@@ -133,6 +135,8 @@ start:
 
     mov ax, word [si + 14]
     mov word [CWD_ID], ax
+    mov bx, word [arg_ptr]
+    call path_append
     jmp .exit
 
 .next_child_entry:
@@ -187,6 +191,63 @@ print_string:
     int 0x10
     jmp .next_char
 .return:
+    ret
+
+path_pop:
+    mov si, PATH_BUFFER
+.find_end:
+    cmp byte [si], 0
+    je .at_end
+    inc si
+    jmp .find_end
+.at_end:
+    dec si
+    cmp si, PATH_BUFFER
+    je .done
+.scan_back:
+    cmp si, PATH_BUFFER
+    je .to_root
+    cmp byte [si], '/'
+    je .cut_here
+    dec si
+    jmp .scan_back
+.cut_here:
+    cmp si, PATH_BUFFER
+    je .to_root
+    mov byte [si], 0
+    ret
+.to_root:
+    mov byte [PATH_BUFFER], '/'
+    mov byte [PATH_BUFFER + 1], 0
+.done:
+    ret
+
+path_append:
+    mov di, PATH_BUFFER
+.find_end2:
+    cmp byte [di], 0
+    je .end2
+    inc di
+    jmp .find_end2
+.end2:
+    cmp di, PATH_BUFFER + 1
+    je .copy_name
+    mov byte [di], '/'
+    inc di
+.copy_name:
+    mov cx, 11
+.copy_loop:
+    mov al, byte [bx]
+    cmp al, 0
+    je .term
+    cmp al, ' '
+    je .term
+    mov byte [di], al
+    inc di
+    inc bx
+    loop .copy_loop
+.term:
+    mov byte [di], 0
     ret
 
 read_lba:
