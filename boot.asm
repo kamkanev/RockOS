@@ -55,7 +55,9 @@ call read_sector                    ; read sector from USB flash drive
 
 
 mov word [0x6fe], 0x0500            ; init where assembler would input machine codes by default
-jmp SHELL_ADDRESS:0x0000                    ;far jump to the shell
+mov word [0x0500], 0                ; CWD_ID = Root (0)
+mov word [0x0502], 31               ; NEXT_SECTOR = 31 (Start of data sectors)
+jmp SHELL_ADDRESS:0x0000            ;far jump to the shell
 
 ;procedure to print a string
 print_string:

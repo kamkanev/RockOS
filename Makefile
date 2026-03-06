@@ -10,6 +10,10 @@ main:
 	nasm -f bin reboot.asm -o reboot.bin
 	nasm -f bin ./cpuinfo/cpuinfo.asm -o ./cpuinfo/info.bin
 	nasm -f bin ./clock/clock.asm -o ./clock/clock.bin
+	nasm -f bin ls.asm -o ls.bin
+	nasm -f bin cd.asm -o cd.bin
+	nasm -f bin mkdir.asm -o mkdir.bin
+	nasm -f bin touch.asm -o touch.bin
 
 	nasm -f bin shell.asm -o shell.bin 
 	
@@ -29,6 +33,10 @@ floppy: main
 	 ./games/bootmine.img 				\
 	 ./pong/pong2.bin					\
 	 reboot.bin							\
+	 ls.bin								\
+	 cd.bin								\
+	 mkdir.bin							\
+	 touch.bin							\
 	 floppy.bin > RockOS.img
 	rm -f *.bin
 
@@ -44,6 +52,10 @@ iso: main
 	 ./games/bootmine.img 						\
 	 ./pong/pong2.bin							\
 	 reboot.bin									\
+	 ls.bin										\
+	 cd.bin										\
+	 mkdir.bin									\
+	 touch.bin									\
 	 floppy.bin > RockOS.iso
 	rm -f *.bin
 

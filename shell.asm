@@ -12,6 +12,8 @@
 %define THEME_ADDR 0x8200               ; physical memory address to load THEME at from sector 6
 %define THEME_UPDATE 0x0045             ; local offset of THEME_ADDR used for far call to update theme
 
+%define user_input 0x0510               ; fixed memory address for user input so other apps can read args
+
 %define ENTER_KEY 0x1c
 %define BACKSPACE_KEY 0x0e
 
@@ -42,7 +44,8 @@ shell_loop:
     ;reset user input
     mov di, user_input              ;point DESTINATION INDEX register to user_iput variable adress
     mov al, 0                       ;al is used by stosb
-    times 20 stosb                  ; store zeros at di and then inc di
+    mov cx, 32                      ;clear 32 bytes
+    rep stosb                       ;store zeros at di
     mov di, user_input
 
     .next_byte:
@@ -95,7 +98,8 @@ shell_loop:
 
 ;search file procedure
 search_file:
-    cmp byte [user_input], 0        ;check first byte user has entered
+    mov al, byte [user_input]
+    cmp al, 0                           ;check first byte user has entered
     je .return
 
     mov bx, 0                       ;file name index
@@ -131,25 +135,29 @@ search_file:
     
     .return: ret
 ;String comparison
-;DI => scasb compares value stored in DI which is 's' with 's' stored in AX reg and then inc. DI if DF is 0
-;           v
-;addr. 1: s|n|a|o|0|        user input
-;addr. 2: s|n|a|k|e|0|      file name
-;           ^
-;SI => lodsb loads value stored at SI to AX and then inc. SI if DF is 0
 compare_strings:
     cld                             ;clear direction flag to use later
-    ;mov di, user_input           ;point DI to target input
     mov si, ax                   ;point SI to source string
 
     .next_byte:
         lodsb                       ;init AX = to where SI points to
         scasb                       ;compare the value of whre DI is pointing at
-        jne .return_false
+        jne .check_arg_space
         cmp al, 0                   ;if reach term 0 at the end
         je .return_true
 
         jmp .next_byte
+
+    .check_arg_space:
+        ; if user typed "mkdir dir" and we expected "mkdir" 
+        ; then scasb failed because user_input had ' ' instead of 0
+        ; let's check if the file name (in AL) is 0 and user input (DI-1) is ' '
+        cmp al, 0
+        jne .return_false
+        cmp byte [di-1], ' '
+        jne .return_false
+        ; It matches the prefix and has space!
+        jmp .return_true
 
     .return_true:
         mov cl, 1
@@ -209,7 +217,6 @@ error_no_file db 'Command not found!',0;, 10, 13, 0
 ;variables
 ;intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
 user_prompt db ' > ', 0
-user_input times 20 db 0
 new_line db 10, 13
 end_file db 0, 0, 0, 0, 0, 0, 0, 0
 ;no_file dw 0
