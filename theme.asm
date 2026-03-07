@@ -42,6 +42,8 @@ mov ax, cs                          ; get current code segment
 mov ds, ax                          ; init DS to current code segment
 mov al, byte [attr]                 ; AL is attribute (1st nibble is background, 2nd nibble is foreground)
 pop ds                              ; restore DS register
+call set_attributes
+retf
 
 ; procedure to set the text-mode attributes for 80x25 screen
 set_attributes:
@@ -58,7 +60,7 @@ set_attributes:
         loop .next_byte             ; process next byte
         pop es                      ; restore ES register
         popa                        ; restore all registers
-        retf                        ; far return to caller app
+        ret                         ; near return
 
 ; procedure to convert ASCII char to nibble (half of a byte)
 ascii_to_hex:
@@ -81,6 +83,12 @@ print_string:
         cmp al, 0                   ; match the zero terminating char of the string
         je .return                  ; return if string doesn't contain any chars any more
         int 0x10                    ; assuming ah = 0x0e int 0x10 would print a single char
+        cmp al, 10
+        jne .next_char
+        push ax
+        mov al, byte [attr]
+        call set_attributes
+        pop ax
         jmp .next_char              ; repeat printing char until string is fully printed
     
     .return:
@@ -113,7 +121,6 @@ attr db 0x1e
 
 ; fill trailing zeros to get exactly 512 bytes long binary file
 times 512 - ($ - $$) db 0
-
 
 
 

@@ -36,12 +36,14 @@ mov sp, bp                          ;set stack pointer
 shell_loop:
 
     call THEME_ADDR:THEME_UPDATE        ; update color scheme
+    mov byte [theme_attr], al
     ;print the user prompt
     mov si, new_line
     call print_string
     ; If newline caused a scroll, BIOS may create the new last row
     ; with default attributes. Re-apply active theme before prompt.
     call THEME_ADDR:THEME_UPDATE
+    mov byte [theme_attr], al
     call print_prompt
 
     ;reset user input
@@ -199,14 +201,71 @@ print_string:
     .return: ret
 
 print_prompt:
+    mov al, byte [theme_attr]
+    mov ah, al
+    and ah, 0xF0
+    and al, 0x0F
+    or al, 0x08                     ; brighten foreground (bold-like)
+    or al, ah
+    mov byte [path_attr], al
+
+    mov ah, 0x03
+    mov bh, 0
+    int 0x10
+    mov byte [path_start_row], dh
+    mov byte [path_start_col], dl
+
     mov si, PATH_BUFFER
     call print_string
+    call recolor_path
+
     mov si, prompt_suffix
     call print_string
     mov ah, 0x03
     mov bh, 0
     int 0x10
     mov byte [prompt_min_col], dl
+    ret
+
+recolor_path:
+    push ax
+    push bx
+    push cx
+    push dx
+    push di
+    push es
+
+    mov ah, 0x03
+    mov bh, 0
+    int 0x10
+    mov al, dl
+    sub al, byte [path_start_col]
+    jbe .ret
+    mov cl, al
+
+    xor ax, ax
+    mov al, byte [path_start_row]
+    mov bl, 80
+    mul bl
+    xor bx, bx
+    mov bl, byte [path_start_col]
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+    mov ax, 0xb800
+    mov es, ax
+    mov al, byte [path_attr]
+.set_attr:
+    mov byte [es:di+1], al
+    add di, 2
+    loop .set_attr
+.ret:
+    pop es
+    pop di
+    pop dx
+    pop cx
+    pop bx
+    pop ax
     ret
 
 ;procedure to read a single sector from USB/HDD
@@ -233,6 +292,10 @@ error_no_file db 'Command not found!',0;, 10, 13, 0
 ;intro db 'Welcome to RockOS! Type "list" to list the avaiable games ', 10, 13, 0
 prompt_suffix db ' > ', 0
 prompt_min_col db 0
+theme_attr db 0x1e
+path_attr db 0x1f
+path_start_row db 0
+path_start_col db 0
 new_line db 10, 13
 end_file db 0, 0, 0, 0, 0, 0, 0, 0
 ;no_file dw 0
