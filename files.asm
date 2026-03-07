@@ -12,6 +12,7 @@ db 'clock', 0, 0, 0
 db 'snake', 0, 0, 0
 db 'mines', 0, 0, 0
 db 'pong', 0, 0, 0, 0
+db 'tetris', 0, 0
 db 'reboot', 0, 0
 db 'ls', 0, 0, 0, 0, 0, 0
 db 'cd', 0, 0, 0, 0, 0, 0

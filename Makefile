@@ -10,6 +10,7 @@ main:
 	nasm -f bin reboot.asm -o reboot.bin
 	nasm -f bin ./cpuinfo/cpuinfo.asm -o ./cpuinfo/info.bin
 	nasm -f bin ./clock/clock.asm -o ./clock/clock.bin
+	nasm -f bin ./pong/pong.asm -o ./pong/pong2.bin
 	nasm -f bin ls.asm -o ls.bin
 	nasm -f bin cd.asm -o cd.bin
 	nasm -f bin mkdir.asm -o mkdir.bin
@@ -29,11 +30,12 @@ floppy: main
 	 clear.bin							\
 	 theme.bin							\
 	 ./clock/clock.bin					\
-	 ./games/snake.img					\
-	 ./games/bootmine.img 				\
-	 ./pong/pong2.bin					\
-	 reboot.bin							\
-	 ls.bin								\
+		 ./games/snake.img					\
+		 ./games/bootmine.img 				\
+		 ./pong/pong2.bin					\
+		 ./games/tetris.img					\
+		 reboot.bin							\
+		 ls.bin								\
 	 cd.bin								\
 	 mkdir.bin							\
 	 touch.bin							\
@@ -48,11 +50,12 @@ iso: main
 	 clear.bin									\
 	 theme.bin									\
 	 ./clock/clock.bin							\
-	 ./games/snake.img							\
-	 ./games/bootmine.img 						\
-	 ./pong/pong2.bin							\
-	 reboot.bin									\
-	 ls.bin										\
+		 ./games/snake.img							\
+		 ./games/bootmine.img 						\
+		 ./pong/pong2.bin							\
+		 ./games/tetris.img							\
+		 reboot.bin									\
+		 ls.bin										\
 	 cd.bin										\
 	 mkdir.bin									\
 	 touch.bin									\

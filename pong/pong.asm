@@ -142,7 +142,9 @@ game_loop:
 
     ;reset game
     r_pressed:
-        ;int 19h                         ;reset vecotor to reload bootlsector
+        mov ah, 0x00                    ; restore default text mode (clears scoreboard artifacts)
+        mov al, 0x03
+        int 0x10
         jmp SHELL_SEGMENT:0x0000            ;go back to shell
 
 ;move ai
@@ -272,7 +274,6 @@ game_over:
 
 game_lost:
     mov dword[es:0000], 0F4F0F4Ch   ;LO
-    mov dword[es:0004], 0F450F53h   ;SE
 
     mov ah, 0x00                        ;BIOS code to read keyboard
     int 0x16                            ;read a single keystroke from the keyboard
@@ -280,8 +281,6 @@ game_lost:
 
 game_won:
     mov dword[es:0000], 0F490F57h   ;WO
-    mov dword[es:0004], 0F210F4Eh   ;N!
-    cli
     mov ah, 0x00                        ;BIOS code to read keyboard
     int 0x16                            ;read a single keystroke from the keyboard
     int 19h
