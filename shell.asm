@@ -39,6 +39,9 @@ shell_loop:
     ;print the user prompt
     mov si, new_line
     call print_string
+    ; If newline caused a scroll, BIOS may create the new last row
+    ; with default attributes. Re-apply active theme before prompt.
+    call THEME_ADDR:THEME_UPDATE
     call print_prompt
 
     ;reset user input

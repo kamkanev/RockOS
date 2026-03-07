@@ -19,9 +19,6 @@ start:
     mov bp, 0x7c00
     mov sp, bp
 
-    mov si, new_line
-    call print_string
-
     mov byte [found_any], 0
     mov cx, 0
 

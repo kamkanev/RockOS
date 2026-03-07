@@ -103,21 +103,7 @@ start:
     call write_lba
 
 .exit:
-    mov si, new_line
-    call print_string
     jmp SHELL_SEGMENT:0x0000
-
-print_string:
-    cld
-    mov ah, 0x0e
-.next_char:
-    lodsb
-    cmp al, 0
-    je .return
-    int 0x10
-    jmp .next_char
-.return:
-    ret
 
 read_lba:
     mov word [dap_lba], ax
@@ -146,6 +132,5 @@ dap_lba:
     dq 0
 
 arg_ptr dw 0
-new_line db 10, 13, 0
 
 times 512 - ($ - $$) db 0
