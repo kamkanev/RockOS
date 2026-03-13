@@ -43,6 +43,7 @@ help_text db 10,13
           db 'cd x  - change dir',10,13
           db 'mkdir x - new dir',10,13
           db 'touch x - new file',10,13
+          db 'nano x - edit file',10,13
           db 'reboot - restart os',10,13,10,13
           db 'Games:',10,13
           db 'snake: WASD, Q exit, R restart',10,13

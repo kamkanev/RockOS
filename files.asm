@@ -18,6 +18,7 @@ db 'ls', 0, 0, 0, 0, 0, 0
 db 'cd', 0, 0, 0, 0, 0, 0
 db 'mkdir', 0, 0, 0
 db 'touch', 0, 0, 0
+db 'nano', 0, 0, 0, 0
 db 0, 0, 0, 0, 0, 0, 0, 0
 
 times 512 - ($ - $$) db 0       ;fill trailing zeros to get exacly 512 bytes long binary file

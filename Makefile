@@ -15,6 +15,7 @@ main:
 	nasm -f bin cd.asm -o cd.bin
 	nasm -f bin mkdir.asm -o mkdir.bin
 	nasm -f bin touch.asm -o touch.bin
+	nasm -f bin nano.asm -o nano.bin
 
 	nasm -f bin shell.asm -o shell.bin 
 	
@@ -39,6 +40,7 @@ floppy: main
 	 cd.bin								\
 	 mkdir.bin							\
 	 touch.bin							\
+	 nano.bin							\
 	 floppy.bin > RockOS.img
 	rm -f *.bin
 
@@ -59,6 +61,7 @@ iso: main
 	 cd.bin										\
 	 mkdir.bin									\
 	 touch.bin									\
+	 nano.bin									\
 	 floppy.bin > RockOS.iso
 	rm -f *.bin
 
