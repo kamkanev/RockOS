@@ -24,6 +24,7 @@ mov ds, ax                          ;set data segment
 mov es, ax                          ;set extra segment
 mov ss, ax                          ;set stack segment
 
+cld
 mov bp, BOOTSECTOR_ADDRESS          ;set stack base pointer
 mov sp, bp                          ;set stack pointer
 
@@ -64,6 +65,10 @@ shell_loop:
         cmp ah, BACKSPACE_KEY       ; is BACKSPACE pressed
         je .erase_char
 
+        cmp di, user_input + 31
+        jae .next_byte
+        cmp al, 0x20
+        jb .next_byte
         stosb                       ;store key that has been pressed into user_input
         mov ah, 0x0e                ;BIOS teletype code
         int 0x10                    ;echo typed character
@@ -128,9 +133,12 @@ search_file:
         mov di, user_input
         call compare_strings        ;compare user_input with file name
         cmp cl, 1                   ;if user input matches file name execute the file
-        je execute                  ;execute binary coresponding to the file name and sector (dl)
-
-        jmp .next_game
+        jne .next_game
+        mov byte [load_count], 1
+        cmp bx, 15 * FILES_ADDR_OFFSET ; nano is the fifteenth command
+        jne execute
+        mov byte [load_count], 3
+        jmp execute
 
     .no_file_found:
         mov si, new_line
@@ -178,13 +186,20 @@ compare_strings:
 execute:
 
     mov ax, BOOTSECTOR_ADDRESS                   ;init the segment
+    cmp byte [load_count], 3
+    jne .destination
+    mov ax, 0x900
+.destination:
     mov es, ax                      ;init extra segment register
     mov bx, 0                       ;init local offset
     mov cl, dl                       ;select sector (4) from USB/HDD
+    mov al, byte [load_count]
     call read_sector                ;read sector
     mov si, new_line
     call print_string
-    jmp BOOTSECTOR_ADDRESS:0x0000                ;jump to the shell
+    push es
+    push word 0
+    retf
 
 ;procedure to print a string
 print_string:
@@ -271,7 +286,6 @@ recolor_path:
 ;procedure to read a single sector from USB/HDD
 read_sector:
     mov ah, 0x02                    ;BIOS code for read from storage device
-    mov al, 1                       ;how many sectors to read
     mov ch, 0                       ;specify celinder
     mov dh, 0                       ;specify head
     mov dl, 0x80                    ;specify HDD code
@@ -296,6 +310,7 @@ theme_attr db 0x1e
 path_attr db 0x1f
 path_start_row db 0
 path_start_col db 0
+load_count db 1
 new_line db 10, 13
 end_file db 0, 0, 0, 0, 0, 0, 0, 0
 ;no_file dw 0

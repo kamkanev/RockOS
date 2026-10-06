@@ -18,6 +18,7 @@ start:
     mov ds, ax
     mov es, ax
     mov ss, ax
+    cld
     mov bp, 0x7c00
     mov sp, bp
 
@@ -43,6 +44,36 @@ start:
     je .exit
     mov word [arg_ptr], bx
 
+    call valid_name
+    cmp al, 1
+    jne .invalid
+    ; Scan every occupied entry before allocating any empty slot.
+    xor cx, cx
+.scan_sector:
+    mov ax, DIR_TABLE_START_LBA
+    add ax, cx
+    push cx
+    call read_lba
+    pop cx
+    jc .exit
+    mov si, DIR_BUFFER
+    mov dx, 32
+.scan_entry:
+    cmp byte [si+11], 0
+    je .next_entry
+    mov ax, [CWD_ID]
+    cmp [si+12], ax
+    jne .next_entry
+    call names_equal
+    cmp al, 1
+    je .exists
+.next_entry:
+    add si, 16
+    dec dx
+    jnz .scan_entry
+    inc cx
+    cmp cx, DIR_TABLE_SECTORS
+    jb .scan_sector
     mov cx, 0
 .read_next_sector:
     cmp cx, DIR_TABLE_SECTORS
@@ -102,6 +133,14 @@ start:
     add ax, cx
     call write_lba
 
+    jmp .exit
+.exists:
+    mov si, exists_msg
+    jmp .message
+.invalid:
+    mov si, invalid_msg
+.message:
+    call print_string
 .exit:
     mov si, new_line
     call print_string
@@ -129,7 +168,7 @@ read_lba:
 
 write_lba:
     mov word [dap_lba], ax
-    mov ah, 0x43
+    mov ax, 0x4300
     mov dl, 0x80
     mov si, dap
     int 0x13
@@ -147,5 +186,9 @@ dap_lba:
 
 arg_ptr dw 0
 new_line db 10, 13, 0
+
+%include "fs_names.inc"
+exists_msg db "Name already exists.",13,10,0
+invalid_msg db "Invalid name (1-11 bytes).",13,10,0
 
 times 512 - ($ - $$) db 0

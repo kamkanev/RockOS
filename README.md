@@ -234,3 +234,19 @@ At the momment the only working commands are `help` and all the commands use see
 Minesweeper (BootMine) from [io12]([io12 (Benjamin Levy) · GitHub](https://github.com/io12))
 
 Theme code and other programs from [Code Monkey King]([maksimKorzh (Code Monkey King) · GitHub](https://github.com/maksimKorzh))
+
+### Filesystem branch
+
+Use `mkdir <name>`, `touch <name>`, `ls`, and `cd <name>` (`cd ..` goes
+back). Names are single components of 1–11 bytes. Files and folders share
+one namespace within each directory; the same name can be used in different
+directories.
+
+`nano <name>` opens a text file or creates it if missing, and refuses folders.
+The bottom two rows show shortcuts and stay outside the editable area, even
+when text scrolls. Type to append text, Enter for a new line, and Backspace to erase within the
+current line. F2 / Ctrl+S saves, F3 / Ctrl+X saves and exits, and F4 / Ctrl+Q
+exits without saving changes. Text is limited to 511 bytes per file.
+
+After `make`, run `python3 tests/filesystem_qemu.py` for the headless QEMU
+regression checks. It uses a temporary copy of the disk image.
